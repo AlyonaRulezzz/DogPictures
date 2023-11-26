@@ -14,4 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Dog Pictures"
-include ':app'
+include(":app")
+ 
