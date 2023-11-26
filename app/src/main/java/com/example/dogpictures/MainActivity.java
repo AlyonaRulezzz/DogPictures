@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,28 +25,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDogImage() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(BASE_URL);
-                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                    InputStream inputStream = httpURLConnection.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                    StringBuilder data = new StringBuilder("");
-                    String result;
-                    do {
-                        result = bufferedReader.readLine();
-                        if (result != null) {
-                            data.append(result);
-                        }
-                    } while (result != null);
-                    Log.d("MainActivity1", data.toString());
-                } catch (Exception e) {
+        new Thread(() -> {
+            try {
+                URL url = new URL(BASE_URL);
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                StringBuilder data = new StringBuilder();
+                String result;
+                do {
+                    result = bufferedReader.readLine();
+                    if (result != null) {
+                        data.append(result);
+                    }
+                } while (result != null);
+
+                JSONObject jsonObject = new JSONObject(data.toString());
+                String message = jsonObject.getString("message");
+                String status = jsonObject.getString("status");
+                DogImage dogImage = new DogImage(message, status);
+
+//                    Log.d("MainActivity1", data.toString());
+                Log.d("MainActivity1", dogImage.toString());
+            } catch (Exception e) {
 //                    throw new RuntimeException(e);
-                    Log.d("MainActivity1", e.toString());
-                }
+                Log.d("MainActivity1", e.toString());
             }
         }).start();
     }
