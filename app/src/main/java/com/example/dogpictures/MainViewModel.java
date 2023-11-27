@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -33,6 +34,10 @@ public class MainViewModel extends AndroidViewModel {
 
     private MutableLiveData<DogImage> dogImage = new MutableLiveData<>();
 
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+
+    private MutableLiveData<Boolean> isLoadingError = new MutableLiveData<>(false);
+
     private Disposable disposable;
 
     public MainViewModel(@NonNull Application application) {
@@ -43,10 +48,36 @@ public class MainViewModel extends AndroidViewModel {
         return dogImage;
     }
 
+    public LiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
+
+    public LiveData<Boolean> getIsLoadingError() {
+        return isLoadingError;
+    }
+
     public void loadDogImage() {
         disposable = loadDogImageRx()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Throwable {
+                        isLoading.setValue(true);
+                    }
+                })
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        isLoading.setValue(false);
+                    }
+                })
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        isLoadingError.setValue(true);
+                    }
+                })
                 .subscribe(new Consumer<DogImage>() {
                     @Override
                     public void accept(DogImage image) throws Throwable {
@@ -56,6 +87,7 @@ public class MainViewModel extends AndroidViewModel {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
+//                        isLoadingError.setValue(true); // the same as in doOnError()
                         Log.d(TAG, "Error: " + throwable.toString());
                     }
                 });

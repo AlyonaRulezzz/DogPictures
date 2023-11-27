@@ -2,4 +2,5 @@
     <string name="app_name">Dog Pictures</string>
     <string name="next_image">next image</string>
     <string name="content_description_picture_of_dog">picture of dog</string>
+    <string name="loading_error_has_occurred">Loading error has occurred</string>
 </resources>
