@@ -26,7 +26,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainViewModel extends AndroidViewModel {
 
-    private static final String BASE_URL = "https://dog.ceo/api/breeds/image/random";
+//    private static final String BASE_URL = "https://dog.ceo/api/breeds/image/random";
 
     private static final String TAG = "MainViewModel1";
     private static final String KEY_MESSAGE = "message";
@@ -57,7 +57,8 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void loadDogImage() {
-        disposable = loadDogImageRx()
+//        disposable = loadDogImageRx()
+        disposable = ApiServiceFactory.getInstance().loadDogImageRetrofit()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new Consumer<Disposable>() {
@@ -93,32 +94,32 @@ public class MainViewModel extends AndroidViewModel {
                 });
     }
 
-    private Single<DogImage> loadDogImageRx() {
-        return Single.fromCallable(new Callable<DogImage>() {
-            @Override
-            public DogImage call() throws Exception {
-                URL url = new URL(BASE_URL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                StringBuilder data = new StringBuilder();
-                String result;
-                do {
-                    result = bufferedReader.readLine();
-                    if (result != null) {
-                        data.append(result);
-                    }
-                } while (result != null);
-
-                JSONObject jsonObject = new JSONObject(data.toString());
-                String message = jsonObject.getString(KEY_MESSAGE);
-                String status = jsonObject.getString(KEY_STATUS);
-                DogImage image = new DogImage(message, status);
-                return image;
-            }
-        });
-    }
+//    private Single<DogImage> loadDogImageRx() {
+//        return Single.fromCallable(new Callable<DogImage>() {
+//            @Override
+//            public DogImage call() throws Exception {
+//                URL url = new URL(BASE_URL);
+//                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+//                InputStream inputStream = httpURLConnection.getInputStream();
+//                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+//                StringBuilder data = new StringBuilder();
+//                String result;
+//                do {
+//                    result = bufferedReader.readLine();
+//                    if (result != null) {
+//                        data.append(result);
+//                    }
+//                } while (result != null);
+//
+//                JSONObject jsonObject = new JSONObject(data.toString());
+//                String message = jsonObject.getString(KEY_MESSAGE);
+//                String status = jsonObject.getString(KEY_STATUS);
+//                DogImage image = new DogImage(message, status);
+//                return image;
+//            }
+//        });
+//    }
 
     @Override
     protected void onCleared() {
